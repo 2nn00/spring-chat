@@ -38,6 +38,8 @@
     </div>
 
     <script>
+        var defaultMemberName = /*[[${defaultMember.name}]]*/ "이다라"; // 기본 사용자 이름을 설정
+
         function loadChatMessages(chattingRoomId, chatRoomName) {
             $('#chatRoomName').text(chatRoomName);
             $.get('/chatting-rooms/' + chattingRoomId + '/messages', function (data) {
@@ -49,8 +51,9 @@
                         $('#messages').append('<div class="date">' + messageDate + '</div>');
                         lastDate = messageDate;
                     }
+                    var alignment = message.senderName === defaultMemberName ? 'right' : 'left';
                     $('#messages').append(
-                        '<div class="message"><strong>' + message.senderName + '</strong>: ' + message.content + ' <small>' + message.createdTime + '</small></div>'
+                        '<div class="message ' + alignment + '"><strong>' + message.senderName + '</strong>: ' + message.content + ' <small>' + message.createdTime + '</small></div>'
                     );
                 });
             });
@@ -89,7 +92,17 @@
 
             $('#send').on('click', function () {
                 var message = $('#message').val();
-                // 여기에서 메시지를 보내는 로직을 추가하십시오.
+                var chatMessage = {
+                    senderName: defaultMemberName,
+                    content: message,
+                    createdTime: new Date().toLocaleTimeString()
+                };
+                var alignment = 'right';
+                $('#messages').append(
+                    '<div class="message ' + alignment + '"><strong>' + chatMessage.senderName + '</strong>: ' + chatMessage.content + ' <small>' + chatMessage.createdTime + '</small></div>'
+                );
+                $('#message').val('');
+                // 여기에서 메시지를 서버로 보내는 로직을 추가하십시오.
             });
         });
     </script>

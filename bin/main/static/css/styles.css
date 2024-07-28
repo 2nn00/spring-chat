@@ -59,6 +59,19 @@ body {
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
+    max-width: 60%;
+    clear: both;
+}
+
+.message.left {
+    float: left;
+    text-align: left;
+}
+
+.message.right {
+    float: right;
+    text-align: right;
+    background-color: #d1e7dd;
 }
 
 .date {

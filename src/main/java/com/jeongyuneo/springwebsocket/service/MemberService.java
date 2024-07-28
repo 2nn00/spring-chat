@@ -24,4 +24,10 @@ public class MemberService {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
     }
+
+    @Transactional(readOnly = true)
+    public Member findByName(String name) {
+        return memberRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+    }
 }
