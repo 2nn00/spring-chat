@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home</title>
+</head>
+
+<body>
+    <h1>Welcome to the Home Page</h1>
+    <form action="/login" method="post">
+        <select name="memberId">
+            <th:block th:each="member : ${members}">
+                <option th:value="${member.id}" th:text="${member.name}"></option>
+            </th:block>
+        </select>
+        <button type="submit">Login</button>
+    </form>
+</body>
+
+</html>

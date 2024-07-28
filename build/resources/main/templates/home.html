@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+
+<body>
+    <div id="chat-page">
+        <div id="chat-container">
+            <div id="member-list">
+                <h2>Members</h2>
+                <ul id="members">
+                    <th:block th:each="member : ${members}">
+                        <li data-id="${member.id}" data-name="${member.name}" class="member-item"
+                            th:text="${member.name}"></li>
+                    </th:block>
+                </ul>
+                <h2>Chat Rooms</h2>
+                <ul id="chatRooms">
+                    <th:block th:each="room : ${chattingRooms}">
+                        <li><a href="#" class="chat-room-link" data-id="${room.chattingRoomId}" data-name="${room.name}"
+                                th:text="${room.name}"></a></li>
+                    </th:block>
+                </ul>
+            </div>
+            <div id="chat-box">
+                <h2 id="chatRoomName">Select a chat room</h2>
+                <div id="messages"></div>
+                <input type="text" id="message" placeholder="Type a message..." />
+                <button id="send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadChatMessages(chattingRoomId, chatRoomName) {
+            $('#chatRoomName').text(chatRoomName);
+            $.get('/chatting-rooms/' + chattingRoomId + '/messages', function (data) {
+                $('#messages').html('');
+                var lastDate = '';
+                data.forEach(function (message) {
+                    var messageDate = new Date(message.createdDate).toLocaleDateString();
+                    if (lastDate !== messageDate) {
+                        $('#messages').append('<div class="date">' + messageDate + '</div>');
+                        lastDate = messageDate;
+                    }
+                    $('#messages').append(
+                        '<div class="message"><strong>' + message.senderName + '</strong>: ' + message.content + ' <small>' + message.createdTime + '</small></div>'
+                    );
+                });
+            });
+        }
+
+        function loadChatRooms() {
+            $.get('/chatting-rooms', function (data) {
+                $('#chatRooms').html('');
+                data.forEach(function (room) {
+                    $('#chatRooms').append(
+                        '<li><a href="#" class="chat-room-link" data-id="' + room.chattingRoomId + '" data-name="' + room.name + '">' + room.name + '</a></li>'
+                    );
+                });
+            });
+        }
+
+        function startPrivateChat(memberId, memberName) {
+            alert("Private chat with " + memberName + " (" + memberId + ")");
+            // 개인 채팅 시작 로직 추가
+        }
+
+        $(document).ready(function () {
+            loadChatRooms();
+
+            $('#chatRooms').on('click', '.chat-room-link', function () {
+                var chattingRoomId = $(this).data('id');
+                var chatRoomName = $(this).data('name');
+                loadChatMessages(chattingRoomId, chatRoomName);
+            });
+
+            $('#members').on('click', '.member-item', function () {
+                var memberId = $(this).data('id');
+                var memberName = $(this).data('name');
+                startPrivateChat(memberId, memberName);
+            });
+
+            $('#send').on('click', function () {
+                var message = $('#message').val();
+                // 여기에서 메시지를 보내는 로직을 추가하십시오.
+            });
+        });
+    </script>
+</body>
+
+</html>
