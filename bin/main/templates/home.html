@@ -38,10 +38,13 @@
     </div>
 
     <script>
-        var defaultMemberName = /*[[${defaultMember.name}]]*/ "이다라"; // 기본 사용자 이름을 설정
+        var defaultMemberName = "이다라"; // 기본 사용자 이름을 설정
+        var defaultMemberId = 1; // 기본 사용자 ID를 설정
+        var currentChatRoomId = 1; // 기본 채팅방 ID를 설정
 
         function loadChatMessages(chattingRoomId, chatRoomName) {
             $('#chatRoomName').text(chatRoomName);
+            currentChatRoomId = chattingRoomId; // 현재 채팅방 ID를 업데이트
             $.get('/chatting-rooms/' + chattingRoomId + '/messages', function (data) {
                 $('#messages').html('');
                 var lastDate = '';
@@ -91,18 +94,30 @@
             });
 
             $('#send').on('click', function () {
-                var message = $('#message').val();
+                var messageContent = $('#message').val();
                 var chatMessage = {
-                    senderName: defaultMemberName,
-                    content: message,
-                    createdTime: new Date().toLocaleTimeString()
+                    senderId: defaultMemberId,
+                    content: messageContent,
+                    chattingRoomId: currentChatRoomId
                 };
-                var alignment = 'right';
-                $('#messages').append(
-                    '<div class="message ' + alignment + '"><strong>' + chatMessage.senderName + '</strong>: ' + chatMessage.content + ' <small>' + chatMessage.createdTime + '</small></div>'
-                );
-                $('#message').val('');
-                // 여기에서 메시지를 서버로 보내는 로직을 추가하십시오.
+
+                // 메시지를 서버로 전송
+                $.ajax({
+                    type: "POST",
+                    url: "/messages",
+                    contentType: "application/json",
+                    data: JSON.stringify(chatMessage),
+                    success: function (response) {
+                        var alignment = 'right';
+                        $('#messages').append(
+                            '<div class="message ' + alignment + '"><strong>' + defaultMemberName + '</strong>: ' + messageContent + ' <small>' + new Date().toLocaleTimeString() + '</small></div>'
+                        );
+                        $('#message').val('');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error sending message: ", error);
+                    }
+                });
             });
         });
     </script>
